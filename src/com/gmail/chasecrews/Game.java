@@ -9,7 +9,10 @@ public class Game extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = -621324396250590664L;
 	
-	public static final int WIDTH = 640, HEIGHT = WIDTH * 9/12;
+	public static final int SIZE = 20;
+	public static final int GRID_X = 20, GRID_Y = 20;
+	
+	public static final int WIDTH = SIZE * GRID_X, HEIGHT = SIZE * GRID_Y;
 	public static final String TITLE = "Wat";
 	
 	private Thread thread;
@@ -20,16 +23,18 @@ public class Game extends Canvas implements Runnable {
 	
 	private Player p;
 	private ScreenText text;
+	private int score = 0;
 	
+	public int[][] grid = new int[GRID_X][GRID_Y];
+			
 	public Game() {
 		handler = new Handler();
 		
 		window = new Window(WIDTH, HEIGHT, TITLE, this);
 		
-		p = new Player(0,HEIGHT/2, ID.Player);
-		text = new ScreenText(30, 30, ID.GUI);
+		p = new Player(0, 0, ID.Player, SIZE, this);
 		handler.addObject(p);
-		handler.addObject(text);
+		text = (ScreenText) handler.addObject(new ScreenText(10, 10, ID.GUI, this, "0", Color.WHITE));
 		
 	}
 	
@@ -52,7 +57,7 @@ public class Game extends Canvas implements Runnable {
 	public void run() {
 		System.out.println("run");
 		long lastTime = System.nanoTime();
-		double amountOfTicks = 60.0;
+		double amountOfTicks = 10.0;
 		double ns = 1000000000 / amountOfTicks;
 		double delta = 0;
 		long timer = System.currentTimeMillis();
@@ -86,8 +91,6 @@ public class Game extends Canvas implements Runnable {
 	private void tick(){
 		handler.tick();
 		window.tick();
-		
-		text.setText(p.getVelX() + "");
 	}
 	private void render(){
 		BufferStrategy bs = this.getBufferStrategy();
@@ -98,7 +101,7 @@ public class Game extends Canvas implements Runnable {
 		
 		Graphics g = bs.getDrawGraphics();
 		
-		g.setColor(Color.green);
+		g.setColor(Color.black);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
 		handler.render(g);
@@ -113,5 +116,13 @@ public class Game extends Canvas implements Runnable {
 	
 	public Handler getHandler(){
 		return handler;
+	}
+	
+	public void gameOver()
+	{
+		ScreenText text = new ScreenText(WIDTH / 2, HEIGHT / 2, ID.GUI, this, "Game Over", Color.RED);
+		handler.addObject(text);
+		handler.render(this.getGraphics());
+		running = false;
 	}
 }

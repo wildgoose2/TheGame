@@ -23,12 +23,14 @@ public class Handler {
 		}
 	}
 	
-	public void addObject(GameObject object){
+	public GameObject addObject(GameObject object){
 		this.object.add(object);
+		return object;
 	}
 	
-	public void removeObject(GameObject object){
+	public GameObject removeObject(GameObject object){
 		this.object.remove(object);
+		return object;
 	}
 	
 	public void keyPressed(KeyEvent e) {
