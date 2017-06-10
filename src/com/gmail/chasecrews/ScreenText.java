@@ -5,12 +5,20 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 
-public class ScreenText extends GameObject{
+public class ScreenText extends GUIObject{
 	
-	private String text = "";
+	private String text;
+	private Color color;
 
-	public ScreenText(int x, int y, ID id) {
-		super(x, y, id);
+	public ScreenText(int x, int y, ID id, Game game) {
+		super(x, y, id, game);
+		this.text = "";
+		this.color = Color.WHITE;
+	}
+	public ScreenText(int x , int y, ID id, Game game, String text, Color color){
+		super(x, y , id, game);
+		this.text = text;
+		this.color = color;
 	}
 
 	@Override
@@ -21,20 +29,8 @@ public class ScreenText extends GameObject{
 
 	@Override
 	public void render(Graphics g) {
-		g.setColor(Color.red);
+		g.setColor(color);
 		g.drawString(text, x, y);
-		
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 

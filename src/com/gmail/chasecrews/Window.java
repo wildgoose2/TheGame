@@ -16,7 +16,7 @@ public class Window extends Canvas{
 		
 		frame = new JFrame(title);
 		
-		KeyListener listener = new GameKeyListener(game.getHandler());
+		KeyListener listener = new GameKeyListener(game.getHandler(), game);
 		
 		frame.addKeyListener(listener);
 		frame.setFocusable(true);

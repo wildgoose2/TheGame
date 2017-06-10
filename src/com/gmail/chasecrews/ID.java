@@ -3,6 +3,7 @@ package com.gmail.chasecrews;
 public enum ID {
 
 	Player(),
-	Enemy(),
+	PlayerBody(),
+	Food(),
 	GUI();
 }
