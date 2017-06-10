@@ -4,37 +4,44 @@ import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Game extends Canvas implements Runnable {
 
 	private static final long serialVersionUID = -621324396250590664L;
 	
-	public static final int SIZE = 20;
-	public static final int GRID_X = 20, GRID_Y = 20;
+	public final int SIZE = 20;
+	public final int GRID_X = 20, GRID_Y = 20;
 	
-	public static final int WIDTH = SIZE * GRID_X, HEIGHT = SIZE * GRID_Y;
+	public final int WIDTH = SIZE * GRID_X + SIZE;
+
+	public final int HEIGHT = SIZE * GRID_Y + SIZE;
 	public static final String TITLE = "Wat";
 	
 	private Thread thread;
 	private boolean running = false;
 	
 	private Handler handler;
+	private GUIHandler gHandler;
 	private Window window;
 	
 	private Player p;
 	private ScreenText text;
 	private int score = 0;
 	
-	public int[][] grid = new int[GRID_X][GRID_Y];
+	public List<PlayerBody> bodies = new ArrayList<PlayerBody>();
 			
 	public Game() {
 		handler = new Handler();
+		gHandler = new GUIHandler();
 		
 		window = new Window(WIDTH, HEIGHT, TITLE, this);
 		
 		p = new Player(0, 0, ID.Player, SIZE, this);
 		handler.addObject(p);
-		text = (ScreenText) handler.addObject(new ScreenText(10, 10, ID.GUI, this, "0", Color.WHITE));
+		handler.addObject(new Food(0,0, ID.Food, this));
+		text = (ScreenText) gHandler.addObject(new ScreenText(10, 10, ID.GUI, this, "0", Color.WHITE));
 		
 	}
 	
@@ -56,31 +63,44 @@ public class Game extends Canvas implements Runnable {
 	
 	public void run() {
 		System.out.println("run");
-		long lastTime = System.nanoTime();
+		long tick_lastTime = System.nanoTime();
+		long frame_lastTime = System.nanoTime();
 		double amountOfTicks = 10.0;
-		double ns = 1000000000 / amountOfTicks;
-		double delta = 0;
+		double amountOfFrames = 60.0;
+		double tick_ns = 1000000000 / amountOfTicks;
+		double frame_ns = 1000000000 / amountOfFrames;
+		double tick_delta = 0;
+		double frame_delta = 0;
 		long timer = System.currentTimeMillis();
 		int frames = 0;
 		
 		while(running){
 			
 			long now = System.nanoTime();
-			delta += (now - lastTime) / ns;
-			lastTime = now;
+			tick_delta += (now - tick_lastTime) / tick_ns;
+			tick_lastTime = now;
 			
-			while(delta >= 1){
+			while(tick_delta >= 1){
 				tick();
-				delta--;
+				tick_delta--;
 			}
 			
 			if(running)
+			{
+				now = System.nanoTime();
+				frame_delta += (now - frame_lastTime) / frame_ns;
+				frame_lastTime = now;
+				
+				while(frame_delta >= 1){
 					render();
-			frames++;
+					frame_delta--;
+					frames++;
+				}
+			}
 			
 			if(System.currentTimeMillis() - timer > 1000){
 				timer += 1000;
-				//System.out.println("FPS: " + frames);
+				System.out.println("FPS: " + frames);
 				frames = 0;
 			}
 		}
@@ -90,7 +110,9 @@ public class Game extends Canvas implements Runnable {
 	
 	private void tick(){
 		handler.tick();
+		gHandler.tick();
 		window.tick();
+		text.setText("Grid X: " + p.getGrid_x() + " Grid Y: " + p.getGrid_y());
 	}
 	private void render(){
 		BufferStrategy bs = this.getBufferStrategy();
@@ -105,6 +127,7 @@ public class Game extends Canvas implements Runnable {
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		
 		handler.render(g);
+		gHandler.render(g);
 		
 		g.dispose();
 		bs.show();
@@ -117,12 +140,35 @@ public class Game extends Canvas implements Runnable {
 	public Handler getHandler(){
 		return handler;
 	}
+	public GUIHandler getGUIHandler(){
+		return gHandler;
+	}
 	
 	public void gameOver()
 	{
 		ScreenText text = new ScreenText(WIDTH / 2, HEIGHT / 2, ID.GUI, this, "Game Over", Color.RED);
-		handler.addObject(text);
-		handler.render(this.getGraphics());
-		running = false;
+		gHandler.addObject(text);
+		gHandler.render(this.getGraphics());
+		gHandler.removeObject(text);
+		stop();
+	}
+	public void reset()
+	{
+		if(!running)
+		{
+			gHandler.clear();
+			handler.clear();
+			p = new Player(0, 0, ID.Player, SIZE, this);
+			handler.addObject(p);
+			handler.addObject(new Food(0,0, ID.Food, this));
+			text = (ScreenText) gHandler.addObject(new ScreenText(10, 10, ID.GUI, this, "0", Color.WHITE));
+			start();
+		}
+	}
+	
+	public void removeLastBody()
+	{
+		handler.removeObject(bodies.get(0));
+		bodies.remove(0);
 	}
 }

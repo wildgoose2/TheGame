@@ -6,10 +6,12 @@ import java.awt.event.KeyListener;
 public class GameKeyListener implements KeyListener{
 
 	private Handler handler;
+	private Game game;
 	
-	public GameKeyListener(Handler handler){
+	public GameKeyListener(Handler handler, Game game){
 		System.out.println("new listener");
 		this.handler = handler;
+		this.game = game;
 	}
 	
 	public void keyPressed(KeyEvent e) {
@@ -21,6 +23,8 @@ public class GameKeyListener implements KeyListener{
 	}
 
 	public void keyTyped(KeyEvent e) {
+		if(e.getKeyChar() == 'b')
+			game.reset();
 	}
 
 }

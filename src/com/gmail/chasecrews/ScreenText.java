@@ -5,7 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 
-public class ScreenText extends GameObject{
+public class ScreenText extends GUIObject{
 	
 	private String text;
 	private Color color;
@@ -31,18 +31,6 @@ public class ScreenText extends GameObject{
 	public void render(Graphics g) {
 		g.setColor(color);
 		g.drawString(text, x, y);
-		
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
 		
 	}
 
